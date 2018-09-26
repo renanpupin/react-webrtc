@@ -1,33 +1,35 @@
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
+const path = require('path');
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
-});
-
-var fs = require('fs');
-var open = require('open');
-var options = {
+let fs = require('fs');
+let open = require('open');
+let options = {
   key: fs.readFileSync('./fake-keys/privatekey.pem'),
   cert: fs.readFileSync('./fake-keys/certificate.pem')
 };
-var serverPort = (process.env.PORT  || 4443);
-var https = require('https');
-var http = require('http');
-var server;
+let serverPort = (process.env.PORT  || 4443);
+let https = require('https');
+let http = require('http');
+let server;
 if (process.env.LOCAL) {
   server = https.createServer(options, app);
 } else {
   server = http.createServer(app);
 }
-var io = require('socket.io')(server, {pingTimeout: 30000});
+let io = require('socket.io')(server, {pingTimeout: 30000});
 
-var roomList = {};
+let roomList = {};
 
 app.get('/', function(req, res){
   console.log('get /');
   res.sendFile(__dirname + '/index.html');
+});
+
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
 
 server.listen(serverPort, function(){
@@ -37,6 +39,8 @@ server.listen(serverPort, function(){
   }
 });
 
+
+//socket
 function socketIdsInRoom(name) {
   var socketIds = io.nsps['/'].adapter.rooms[name];
   if (socketIds) {
