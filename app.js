@@ -9,23 +9,22 @@ let options = {
   key: fs.readFileSync('./fake-keys/privatekey.pem'),
   cert: fs.readFileSync('./fake-keys/certificate.pem')
 };
-let serverPort = (process.env.PORT  || 4443);
+let serverPort = (process.env.PORT  || 5000);
 let https = require('https');
 let http = require('http');
+
 let server;
 if (process.env.LOCAL) {
   server = https.createServer(options, app);
 } else {
   server = http.createServer(app);
 }
-let io = require('socket.io')(server, {pingTimeout: 30000});
+let io = require('socket.io')(server, { pingTimeout: 30000 });
 
-let roomList = {};
-
-app.get('/', function(req, res){
-  console.log('get /');
-  res.sendFile(__dirname + '/index.html');
-});
+// app.get('/', function(req, res){
+//   console.log('get /');
+//   res.sendFile(__dirname + '/index.html');
+// });
 
 
 app.get('*', (req, res) => {
@@ -41,6 +40,7 @@ server.listen(serverPort, function(){
 
 
 //socket
+let roomList = {};
 function socketIdsInRoom(name) {
   var socketIds = io.nsps['/'].adapter.rooms[name];
   if (socketIds) {
