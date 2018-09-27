@@ -19,6 +19,14 @@ export default class Session extends Component {
         };
 
         this.socket = socketIO();
+
+        this.socket.on('exchange', (data) => {
+            this.exchange(data);
+        });
+        this.socket.on('leave', (socketId) => {
+            this.leave(socketId);
+        });
+
     }
 
     logError(error) {
@@ -108,7 +116,7 @@ export default class Session extends Component {
             console.log('onaddstream', event);
             // var element = document.createElement('video');
             let otherPeer = {
-                id: "remoteView" + socketId,
+                id: socketId,
                 stream: event.stream,
             };
             console.log("other PEER ", otherPeer);
@@ -126,6 +134,44 @@ export default class Session extends Component {
         });
         return pc;
     }
+
+    exchange(data) {
+        let fromId = data.from;
+        let pc;
+        if (fromId in this.state.pcPeers) {
+            pc = this.state.pcPeers[fromId];
+        } else {
+            pc = this.createPC(fromId, false);
+        }
+
+        if (data.sdp) {
+            console.log('exchange sdp', data);
+            pc.setRemoteDescription(new RTCSessionDescription(data.sdp), () => {
+                if (pc.remoteDescription.type === "offer")
+                    pc.createAnswer((desc) => {
+                        console.log('createAnswer', desc);
+                        pc.setLocalDescription(desc, () => {
+                            console.log('setLocalDescription', pc.localDescription);
+                            this.socket.emit('exchange', {'to': fromId, 'sdp': pc.localDescription });
+                        }, this.logError);
+                    }, this.logError);
+            }, this.logError);
+        } else {
+            console.log('exchange candidate', data);
+            pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+    }
+
+    leave(socketId) {
+        console.log('leave', socketId);
+        let pc = this.state.pcPeers[socketId];
+        pc.close();
+        this.setState({
+            pcPeers: this.state.pcPeers.splice(socketId),
+            othersPeers: this.state.othersPeers.filter(e => e.id !== socketId),
+        });
+    }
+
 
 
     join() {
@@ -145,7 +191,7 @@ export default class Session extends Component {
     renderOtherPeers(otherPeer, index) {
         return (
             <Peer
-                id={otherPeer.id}
+                id={"remoteView " + otherPeer.id}
                 key={index}
                 videoSource={otherPeer.stream ? URL.createObjectURL(otherPeer.stream) : null}
             />
