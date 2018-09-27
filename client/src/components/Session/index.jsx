@@ -121,7 +121,7 @@ export default class Session extends Component {
             };
             console.log("other PEER ", otherPeer);
             this.setState({
-                othersPeers: [...this.state.othersPeers, ...otherPeer],
+                othersPeers: [...this.state.othersPeers, otherPeer],
             });
             // element.id = "remoteView" + socketId;
             // element.autoplay = 'autoplay';
