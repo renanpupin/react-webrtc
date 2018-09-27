@@ -1,4 +1,4 @@
-import React, {Component, Fragment} from "react";
+import React, {Component} from "react";
 import Peer from "../../components/Peer";
 import socketIO from 'socket.io-client';
 const RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.msRTCPeerConnection;
@@ -35,14 +35,14 @@ export default class Session extends Component {
         }, this.logError);
     }
 
-    createOffer(pc) {
-        pc.createOffer(function(desc) {
+    createOffer(pc, socketId) {
+        pc.createOffer((desc) => {
             console.log('createOffer', desc);
-            pc.setLocalDescription(desc, function () {
+            pc.setLocalDescription(desc, () => {
                 console.log('setLocalDescription', pc.localDescription);
-                socket.emit('exchange', {'to': socketId, 'sdp': pc.localDescription });
-            }, logError);
-        }, logError);
+                this.socket.emit('exchange', {'to': socketId, 'sdp': pc.localDescription });
+            }, this.logError);
+        }, this.logError);
     }
 
     createDataChannel(pc) {
@@ -90,7 +90,7 @@ export default class Session extends Component {
         pc.onnegotiationneeded = () => {
             console.log('onnegotiationneeded');
             if(isOffer) {
-                this.createOffer(pc);
+                this.createOffer(pc, socketId);
             }
         };
 
