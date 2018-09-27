@@ -121,6 +121,9 @@ export default class Session extends Component {
             // remoteViewContainer.appendChild(element);
         };
         pc.addStream(this.state.selfVideoStream);
+        this.setState({
+            pcPeers,
+        });
         return pc;
     }
 
