@@ -150,7 +150,7 @@ export default class Session extends Component {
 
 
     render() {
-        const othersPeers = this.state.pcPeers.map((item, index) => this.renderOtherPeers(item, index));
+        const othersPeers = this.state.othersPeers.map((item, index) => this.renderOtherPeers(item, index));
         return (
             <div className={"rw-session-container"}>
                 <Peer
