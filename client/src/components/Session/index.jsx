@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 import Peer from "../../components/Peer";
 import socketIO from 'socket.io-client';
 const RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.msRTCPeerConnection;
@@ -15,6 +15,7 @@ export default class Session extends Component {
         this.state = {
             selfVideoStream: null,
             connectedToSocket: false,
+            othersPeers: [],
         };
 
         this.pc = null;
@@ -41,18 +42,33 @@ export default class Session extends Component {
                 var socketId = socketIds[i];
                 // createPC(socketId, true);
             }
-            this.setState({connectedToSocket: true});
+            this.setState({
+                connectedToSocket: true,
+                othersPeers: socketIds,
+            });
         });
+    }
+
+    renderOtherPeers(otherPeer, index) {
+        return (
+            <Peer
+                id={"remoteView" + index}
+                key={index}
+                videoSource={this.state.selfVideoStream ? URL.createObjectURL(this.state.selfVideoStream) : null}
+            />
+        );
     }
 
 
     render() {
+        const othersPeers = this.state.othersPeers.map((item, index) => this.renderOtherPeers(item, index))
         return (
             <div className={"rw-session-container"}>
                 <Peer
                     id={"selfPeer"}
                     videoSource={this.state.selfVideoStream ? URL.createObjectURL(this.state.selfVideoStream) : null}
                 />
+                {othersPeers}
                 {!this.state.connectedToSocket &&
                 <div className={"rw-connect-dialog-container"}>
                     <div className={"rw-backdrop"}>
