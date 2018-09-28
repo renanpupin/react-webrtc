@@ -6,7 +6,9 @@ const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessi
 navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia;
 
 const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-
+const constraints = {
+    video: {width: {exact: 320}, height: {exact: 240}}
+};
 
 export default class Session extends Component {
     constructor(props) {
@@ -37,10 +39,14 @@ export default class Session extends Component {
         this.getLocalStream();
     }
 
-    getLocalStream() {
-        navigator.getUserMedia({ "audio": true, "video": true }, (stream) => {
+    async getLocalStream() {
+        try {
+            let stream = await navigator.mediaDevices.getUserMedia(constraints);
+            console.log(stream);
             this.setState({selfVideoStream: stream});
-        }, this.logError);
+        } catch (e) {
+            this.logError(e);
+        }
     }
 
     createOffer(pc, socketId) {
