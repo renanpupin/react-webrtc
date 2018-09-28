@@ -14,15 +14,15 @@ body {
 
 
 .rw-peer-container {
-  width: 20vw;
-  height: 240px;
+  height: 100%;
+  width: 100%;
   background-color: black;
   animation: 1s fade-in ease;
 }
 
 .rw-peer-container video {
-  height: 100%;
-  width: 100%;
+  width: 20vw;
+  height: 240px;
 }
 @media only screen
 and (max-device-width: 736px) {
