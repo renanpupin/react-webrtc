@@ -35,8 +35,9 @@ export default class Session extends Component {
         console.log("logError", error);
     }
 
-    componentDidMount() {
-        this.getLocalStream();
+    async componentDidMount() {
+        await this.getLocalStream();
+        this.join();
     }
 
     async getLocalStream() {
@@ -198,7 +199,7 @@ export default class Session extends Component {
         return (
             <Peer
                 id={"remoteView " + otherPeer.id}
-                key={index}
+                key={otherPeer.id}
                 videoSource={otherPeer.stream ? URL.createObjectURL(otherPeer.stream) : null}
             />
         );
@@ -213,23 +214,24 @@ export default class Session extends Component {
                     id={"selfPeer"}
                     videoSource={this.state.selfVideoStream ? URL.createObjectURL(this.state.selfVideoStream) : null}
                 />
+
                 {othersPeers}
-                {!this.state.connectedToSocket &&
-                <div className={"rw-connect-dialog-container"}>
-                    <div className={"rw-backdrop"}>
-                        <div className={"rw-connect-dialog"}>
-                            <span>
-                                Atenção
-                            </span>
-                            <span>
-                                Ainda não conectado a sessão. Deseja conectar?
-                            </span>
-                            <button onClick={() => this.join()}>
-                                Sim
-                            </button>
-                        </div>
-                    </div>
-                </div>}
+                {/*{!this.state.connectedToSocket &&*/}
+                {/*<div className={"rw-connect-dialog-container"}>*/}
+                    {/*<div className={"rw-backdrop"}>*/}
+                        {/*<div className={"rw-connect-dialog"}>*/}
+                            {/*<span>*/}
+                                {/*Atenção*/}
+                            {/*</span>*/}
+                            {/*<span>*/}
+                                {/*Ainda não conectado a sessão. Deseja conectar?*/}
+                            {/*</span>*/}
+                            {/*<button onClick={() => this.join()}>*/}
+                                {/*Sim*/}
+                            {/*</button>*/}
+                        {/*</div>*/}
+                    {/*</div>*/}
+                {/*</div>}*/}
             </div>
         )
     }
