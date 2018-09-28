@@ -18,6 +18,9 @@ body {
   width: 100%;
   background-color: black;
   animation: 1s fade-in ease;
+  align-items: center;
+  display: grid;
+}
 }
 
 .rw-peer-container video {
